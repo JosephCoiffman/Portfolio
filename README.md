@@ -1,4 +1,5 @@
 # portfolio-project
+This is the asignment for FocusGame.py
 
 Write a class named FocusGame for playing an abstract board game called Focus/Domination. You can see the rules [here](https://en.wikipedia.org/wiki/Focus_(board_game)).
 
