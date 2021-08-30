@@ -30,6 +30,9 @@ class Player:
     def add_to_reserved(self):
         self._reserved += 1
 
+    def remove_from_reserved(self):
+        self._reserved -= 1
+
 
 
 
@@ -37,7 +40,7 @@ class Player:
 class FocusGame:
     """The board will be a list of lists, 6 X 6, each position will contain the players color on that position
      has object to help player make a move and returns the appropriate response"""
-    def __init__(self, _player1, _player2):
+    def __init__(self, _player1=list, _player2=list):
         self._player1 = Player(_player1[0], _player1[1])
         self._player2 = Player(_player2[0], _player2[1])
         self._board = [[[_player1[1]], [_player1[1]], [_player2[1]], [_player2[1]], [_player1[1]], [_player1[1]]],
@@ -51,7 +54,9 @@ class FocusGame:
         self._players = [self._player1, self._player2]
         self._is_win = False
 
-    def move_piece(self, player_name, move_from, move_to, number_of_pieces):
+
+
+    def move_piece(self, player_name=str, move_from=tuple, move_to=tuple, number_of_pieces=int):
         """will first make sure that the game is not over, then make sure that is it that players turn,
         then make sure it is a valid location that the player is moving to or from.
         Finally, it will update the board to reflect the move, update the captured and reserved pieces,
@@ -59,7 +64,7 @@ class FocusGame:
         if self._is_win is True:
             return False
         for player in self._players:
-            if player.get_name() == player_name:  # makes  sure player is refering to the correct player
+            if player.get_name() == player_name:  # makes  sure player is referring to the correct player
                 if self.check_turn(player_name) is False:
                     return "not your turn"
                 if self.check_valid_location(player_name, move_from, move_to, number_of_pieces) is False:
@@ -68,7 +73,7 @@ class FocusGame:
                     return 'invalid number of pieces'
                 add_list = []
                 for piece in range(number_of_pieces):  # going to update the board
-                    add_list += self._board[move_from[0]][move_from[1]][-1]
+                    add_list += self._board[move_from[0]][move_from[1]]
                     self._board[move_from[0]][move_from[1]] = self._board[move_from[0]][move_from[1]][:-1]
                 for piece in add_list[::-1]:
                     self._board[move_to[0]][move_to[1]].append(piece)
@@ -76,19 +81,22 @@ class FocusGame:
                 if self.check_win(player_name) is True:
                     return player_name + " Wins"
                 self.change_turn()
-                return 'successfully moved'
+                return 'successfully moved', self.print_board()
 
     def print_board(self):
         """ prints the board"""
-        for x in range(6):
-            for y in range(6):
-                print(self._board[x][y], end=" ")
-            print('\n')
+        for x in self._board:
+            print(x)
+        print()
+        print()
 
     def check_valid_location(self, player_name, move_from, move_to, number_of_pieces):
         """ Checks to see if player is making a valid move"""
         for player in self._players:
             if player.get_name() == player_name:
+                if move_from[0] >= 6 or move_from[0] < 0 or move_from[1] >= 6 or move_from[1] < 0 or move_to[0] >= 6 or\
+                        move_to[0] < 0 or move_to[1] >= 6 or move_to[1] < 0:   #makes sure valid place
+                    return False
                 if self.top_of_stack(move_from) != player.get_color():  # makes sure player is moving from a place
                     return False                                        # that has his piece on top.
                 if not (move_to[0] == move_from[0] or move_to[1] == move_from[1]):  # makes sure not moving diagonally.
@@ -180,6 +188,7 @@ class FocusGame:
                 self.capture_and_reserve(player_name, position)
                 self.check_win(player_name)
                 self.change_turn()
+                player.remove_from_reserved()
                 return 'successfully moved'
 
 
